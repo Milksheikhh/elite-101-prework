@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: white;
+            padding: 12px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nav-items {
+            display: flex;
+            gap: 24px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .chat-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 80px);
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .bot-avatar {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .user-avatar {
+            background: #007bff;
+            color: white;
+        }
+        
+        .message-content {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 70%;
+            line-height: 1.4;
+            color: #333;
+            white-space: pre-line;
+            word-wrap: break-word;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message.user .message-content {
+            background: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-container {
+            padding: 16px 24px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+        
+        .input-form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            background: #f8f9fa;
+        }
+        
+        .input-field:focus {
+            border-color: #007bff;
+            background: white;
+        }
+        
+        .send-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .send-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="nav-items">
+            <span>Customer Service</span>
+        </div>
+        <div class="user-section">
+            <div style="width: 32px; height: 32px; background: #e0e0e0; border-radius: 50%;"></div>
+        </div>
+    </div>
+    
+    <div class="chat-container">
+        <div class="messages" id="chatContainer">
+            {% for message in chat_history %}
+                <div class="message {{ 'user' if message.type == 'user' else 'bot' }}">
+                    <div class="avatar {{ 'user-avatar' if message.type == 'user' else 'bot-avatar' }}">
+                    </div>
+                    <div class="message-content">{{ message.message }}</div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="input-container">
+            <form method="POST" class="input-form">
+                <input type="text" name="user_input" class="input-field" placeholder="Type your message..." autocomplete="off" autofocus required>
+                <button type="submit" class="send-btn">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+        
+        const form = document.querySelector('.input-form');
+        form.addEventListener('submit', function() {
+            setTimeout(function() {
+                document.querySelector('.input-field').focus();
+            }, 100);
+        });
+        
+        const observer = new MutationObserver(function() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+        
+        observer.observe(document.getElementById('chatContainer'), {
+            childList: true,
+            subtree: true
+        });
+    </script>
+</body>
+</html>
