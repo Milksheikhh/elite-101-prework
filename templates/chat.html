@@ -182,8 +182,11 @@
         
         <div class="input-container">
             <form method="POST" class="input-form">
-                <input type="text" name="user_input" class="input-field" placeholder="Type your message..." autocomplete="off" autofocus required>
-                <button type="submit" class="send-btn">Send</button>
+                <input type="hidden" name="step" value="{{ step or '1' }}">
+                <input type="hidden" name="customer_name" value="{{ customer_name or '' }}">
+                <input type="hidden" name="order_id" value="{{ order_id or '' }}">
+                <input type="text" name="user_input" class="input-field" placeholder="Type your message..." autocomplete="off" autofocus required {% if step == 'done' %}disabled{% endif %}>
+                <button type="submit" class="send-btn" {% if step == 'done' %}disabled{% endif %}>Send</button>
             </form>
         </div>
     </div>
