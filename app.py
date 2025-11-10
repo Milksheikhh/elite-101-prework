@@ -35,7 +35,7 @@ ORDERS = {
 def index():
     return redirect(url_for('chat'))
 
-@app.route('/chat', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def chat():
     chat_history = []
     
@@ -60,18 +60,20 @@ def chat():
                 chat_history.append({'type': 'bot', 'message': f"Hello {customer_name}! I'm here to help you with returns and exchanges. Please enter your order ID:"})
                 chat_history.append({'type': 'user', 'message': user_input})
                 
-                if user_input.upper() in ORDERS:
-                    order_id = user_input.upper()
+                # Handle both typed input and button selections
+                order_input = user_input.upper().strip()
+                if order_input in ORDERS:
+                    order_id = order_input
                     order = ORDERS[order_id]
                     items_list = "\n".join([f"• {item}" for item in order['items']])
                     chat_history.append({'type': 'bot', 'message': f"Great! I found your order {order_id} from {order['date']}.\n\nItems in this order:\n{items_list}\n\nHow can I help you today?\n\n1. Return an item\n2. Exchange an item\n3. Check return policy\n\nPlease enter the number of your choice:"})
                     return render_template('chat.html', chat_history=chat_history, step='3', customer_name=customer_name, order_id=order_id)
                 else:
-                    chat_history.append({'type': 'bot', 'message': f"I couldn't find order ID '{user_input}'. Please check your order ID and try again. Valid format example: ORD001"})
+                    chat_history.append({'type': 'bot', 'message': f"I couldn't find order ID '{user_input}'. Please check your order ID and try again. Available orders: ORD001, ORD002, ORD003, ORD004, ORD005"})
                     return render_template('chat.html', chat_history=chat_history, step='2', customer_name=customer_name)
         
         elif step == '3':  # Handling final choice
-            if user_input:
+            if user_input and order_id:
                 order = ORDERS[order_id]
                 items_list = "\n".join([f"• {item}" for item in order['items']])
                 
@@ -93,6 +95,25 @@ def chat():
                     return render_template('chat.html', chat_history=chat_history, step='3', customer_name=customer_name, order_id=order_id)
                 
                 return render_template('chat.html', chat_history=chat_history, step='done')
+            else:
+                # If we're in step 3 but missing data, rebuild the state
+                if order_id and order_id in ORDERS:
+                    order = ORDERS[order_id]
+                    items_list = "\n".join([f"• {item}" for item in order['items']])
+                    
+                    chat_history.append({'type': 'bot', 'message': "Welcome to Customer Service! I'm here to help you with returns and exchanges. What's your name?"})
+                    chat_history.append({'type': 'user', 'message': customer_name})
+                    chat_history.append({'type': 'bot', 'message': f"Hello {customer_name}! I'm here to help you with returns and exchanges. Please enter your order ID:"})
+                    chat_history.append({'type': 'user', 'message': order_id})
+                    chat_history.append({'type': 'bot', 'message': f"Great! I found your order {order_id} from {order['date']}.\n\nItems in this order:\n{items_list}\n\nHow can I help you today?\n\n1. Return an item\n2. Exchange an item\n3. Check return policy\n\nPlease enter the number of your choice:"})
+                    
+                    return render_template('chat.html', chat_history=chat_history, step='3', customer_name=customer_name, order_id=order_id)
+                else:
+                    # If we don't have valid order_id, go back to step 2
+                    chat_history.append({'type': 'bot', 'message': "Welcome to Customer Service! I'm here to help you with returns and exchanges. What's your name?"})
+                    chat_history.append({'type': 'user', 'message': customer_name})
+                    chat_history.append({'type': 'bot', 'message': f"Hello {customer_name}! I'm here to help you with returns and exchanges. Please enter your order ID:"})
+                    return render_template('chat.html', chat_history=chat_history, step='2', customer_name=customer_name)
     
     # Initial load
     chat_history.append({'type': 'bot', 'message': "Welcome to Customer Service! I'm here to help you with returns and exchanges. What's your name?"})

@@ -149,6 +149,74 @@
         .send-btn:hover {
             background: #0056b3;
         }
+        
+        .order-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+        
+        .order-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .order-btn:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+            color: #007bff;
+        }
+        
+        .order-btn:active {
+            background: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+        
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+        
+        .option-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .option-btn:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+            color: #007bff;
+        }
+        
+        .option-btn:active {
+            background: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -170,12 +238,19 @@
         </div>
         
         <div class="input-container">
+            {% if step == '3' %}
+            <div class="option-buttons">
+                <button type="button" class="option-btn" onclick="selectOption('1')">1. Return an item</button>
+                <button type="button" class="option-btn" onclick="selectOption('2')">2. Exchange an item</button>
+                <button type="button" class="option-btn" onclick="selectOption('3')">3. Check return policy</button>
+            </div>
+            {% endif %}
             <form method="POST" class="input-form">
                 <input type="hidden" name="step" value="{{ step or '1' }}">
                 <input type="hidden" name="customer_name" value="{{ customer_name or '' }}">
                 <input type="hidden" name="order_id" value="{{ order_id or '' }}">
-                <input type="text" name="user_input" class="input-field" placeholder="Type your message..." autocomplete="off" autofocus required {% if step == 'done' %}disabled{% endif %}>
-                <button type="submit" class="send-btn" {% if step == 'done' %}disabled{% endif %}>Send</button>
+                <input type="text" name="user_input" class="input-field" placeholder="{% if step == '3' %}Click an option above{% else %}Type your message...{% endif %}" autocomplete="off" autofocus required {% if step == 'done' or step == '3' %}disabled{% endif %}>
+                <button type="submit" class="send-btn" {% if step == 'done' or step == '3' %}disabled{% endif %}>Send</button>
             </form>
         </div>
     </div>
@@ -202,6 +277,45 @@
             childList: true,
             subtree: true
         });
+        
+        function selectOrderId(orderId) {
+            const inputField = document.querySelector('.input-field');
+            inputField.value = orderId;
+            inputField.focus();
+            
+            // Add visual feedback when clicked
+            const buttons = document.querySelectorAll('.order-btn');
+            buttons.forEach(btn => btn.style.background = '#f8f9fa');
+            buttons.forEach(btn => btn.style.color = '#495057');
+            buttons.forEach(btn => btn.style.borderColor = '#e9ecef');
+            
+            const clickedButton = event.target;
+            clickedButton.style.background = '#007bff';
+            clickedButton.style.color = 'white';
+            clickedButton.style.borderColor = '#007bff';
+        }
+        
+        function selectOption(option) {
+            const inputField = document.querySelector('.input-field');
+            const form = document.querySelector('.input-form');
+            
+            // Temporarily enable the input field to set its value
+            inputField.disabled = false;
+            inputField.value = option;
+            
+            // Add visual feedback when clicked
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.style.background = '#f8f9fa');
+            buttons.forEach(btn => btn.style.color = '#495057');
+            buttons.forEach(btn => btn.style.borderColor = '#e9ecef');
+            
+            const clickedButton = event.target;
+            clickedButton.style.background = '#007bff';
+            clickedButton.style.color = 'white';
+            clickedButton.style.borderColor = '#007bff';
+
+            form.submit();
+        }
     </script>
 </body>
 </html>
